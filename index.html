@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>phaser3</title>
+    <style>
+	*{margin:0;padding:0}
+        canvas{padding:0;margin: 0 auto;}
+    </style>
+</head>
+<body>
+<script src="phaser.min.js"></script>
+<script src="wavesurfer.js"></script>
+
+</body>
+
+<script>
+
+
+
+
+var gameScene = {
+    key:'gameScene',
+    active:true,
+    preload: function(){
+	
+	this.load.image("1","1.jpg")
+	},
+    create: function(){
+		
+		this.rope = this.add.rope(1545/2,1171/2,"1")
+		console.log()
+	},
+	update:function(a,b){
+	
+        let points = this.rope.points;
+
+        for (let i = 0; i < points.length; i++)
+        {
+			
+                points[i].y = Math.sin(i * 0.5 + (window.pl/10)) * window.pl ;
+          
+            
+        }
+       this.cameras.main.shake(b, window.pl /1000, true );
+	     this.cameras.main.fade( window.pl/100);
+        this.rope.setDirty();
+	
+	
+		
+	}
+}
+var config = {
+    type: Phaser.AUTO,
+    width: 1545,
+    height: 1171,
+    // 设置重力
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 600 },
+            debug: false,
+        }
+    },
+    scene: [gameScene],
+};
+var game = new Phaser.Game(config);
+var audio = new Audio("1.mp3");
+var AudioContext = new (window.AudioContext || window.webkitAudioContext)();
+var source = AudioContext.createMediaElementSource(audio)
+var analyser = AudioContext.createAnalyser();
+source.connect(analyser);
+analyser.connect(AudioContext.destination)
+audio.play()
+var output = new Uint8Array(1);//这里可以设置获取数组的长度
+(function createAudio(){
+	analyser.getByteFrequencyData(output);
+	window.pl = eval(output.join("+"))/1
+	console.log(window.pl )
+	requestAnimationFrame(createAudio)
+})()
+</script>
+</html>
